@@ -9,7 +9,9 @@ const rl = readline.createInterface({
 
 const writeStream = fs.createWriteStream(path.join(__dirname, 'new.txt'));
 rl.question('Hello! How are you today? ', (answer) => {
-  writeStream.write(answer);
+  if (answer.match(/^exit$/i)) {
+    rl.close();
+  } else writeStream.write(answer);
   rl.on('line', (answer) => {
     if (answer.match(/^exit$/i)) {
       rl.close();
