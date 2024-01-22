@@ -14,7 +14,6 @@ function makeDir(pathToDir) {
 
 fs.access(path.join(__dirname, 'project-dist'), (error) => {
   if (error) {
-    console.log('No project-dist directory');
     const projectDistPath = path.join(__dirname, 'project-dist');
     makeDir(projectDistPath);
     const projectDistPathAssets = path.join(
@@ -26,7 +25,6 @@ fs.access(path.join(__dirname, 'project-dist'), (error) => {
     handleCss();
     copyAssets(pathToAssets);
   } else {
-    console.log('dir exists');
     handleCss();
     copyAssets(pathToAssets);
   }
