@@ -1,34 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 let templateHtmlContent = '';
+const pathToAssets = path.join(__dirname, 'assets');
+
+function makeDir(pathToDir) {
+  fs.mkdir(pathToDir, (error) => {
+    if (error) {
+      console.log('Error found:', error);
+    }
+    console.log('Created directory. ', pathToDir);
+  });
+}
 
 fs.access(path.join(__dirname, 'project-dist'), (error) => {
-  function makeDir() {
-    fs.mkdir(path.join(__dirname, 'project-dist'), (error) => {
-      if (error) {
-        console.log('makeDir Error found:', error);
-      }
-      console.log('Created project-dist directory');
-    });
-  }
   if (error) {
     console.log('no dir');
-    makeDir();
-    handleCss()
+    const projectDistPath = path.join(__dirname, 'project-dist');
+    makeDir(projectDistPath);
+    const projectDistPathAssets = path.join(
+      __dirname,
+      'project-dist',
+      'assets',
+    );
+    makeDir(projectDistPathAssets);
+    handleCss();
+    copyAssets(pathToAssets);
   } else {
     console.log('dir exists');
     handleCss();
-    // fs.rm(
-    //   path.join(__dirname, 'project-dist'),
-    //   { recursive: true },
-    //   (error) => {
-    //     console.log('deleting folder');
-    //     if (error) {
-    //       console.log('rm Error found:', error);
-    //     }
-    //   },
-    // );
-    // makeDir();
+    copyAssets(pathToAssets);
   }
 });
 
@@ -95,4 +95,29 @@ function handleCss() {
         fillFile();
       });
     });
+}
+
+function copyAssets(dirname) {
+  fs.readdir(dirname, { withFileTypes: true }, (err, files) => {
+    files.forEach((file) => {
+      const currentFilePath = path.join(dirname, file.name);
+      const newFilePath = path.join(
+        currentFilePath.split('06-build-page')[0],
+        '06-build-page',
+        'project-dist',
+        currentFilePath.split('06-build-page')[1],
+      );
+      if (file.isDirectory()) {
+        makeDir(newFilePath);
+        copyAssets(currentFilePath);
+      }
+      fs.copyFile(currentFilePath, newFilePath, (error) => {
+        if (error) {
+          console.log('Error Found:', error);
+        } else {
+          console.log(`File ${file.name} has been copied successfully.`);
+        }
+      });
+    });
+  });
 }
