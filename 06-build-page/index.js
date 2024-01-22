@@ -8,13 +8,13 @@ function makeDir(pathToDir) {
     if (error) {
       console.log('Error found:', error);
     }
-    console.log('Created directory. ', pathToDir);
+    console.log('Created directory ', pathToDir);
   });
 }
 
 fs.access(path.join(__dirname, 'project-dist'), (error) => {
   if (error) {
-    console.log('no dir');
+    console.log('No project-dist directory');
     const projectDistPath = path.join(__dirname, 'project-dist');
     makeDir(projectDistPath);
     const projectDistPathAssets = path.join(
@@ -50,7 +50,7 @@ readStream.on('data', (dataChunk) => {
             return;
           }
           const componentContent = data;
-          console.log('Reading HTML file ' + currentFilePath);
+          console.log('Copying HTML file ' + currentFilePath);
           const templateTag = '{{' + filename + '}}';
           templateHtmlContent = templateHtmlContent.replace(
             templateTag,
@@ -87,7 +87,7 @@ function handleCss() {
             });
           });
           if (extension === 'css') {
-            console.log('Reading CSS file ' + currentFilePath);
+            console.log('Copying CSS file ' + currentFilePath);
             const cssChunk = await promise;
             writeStreamCss.write(cssChunk);
           }
@@ -110,14 +110,15 @@ function copyAssets(dirname) {
       if (file.isDirectory()) {
         makeDir(newFilePath);
         copyAssets(currentFilePath);
+      } else {
+        fs.copyFile(currentFilePath, newFilePath, (error) => {
+          if (error) {
+            console.log('Error Found:', error);
+          } else {
+            console.log(`File ${file.name} has been copied successfully.`);
+          }
+        });
       }
-      fs.copyFile(currentFilePath, newFilePath, (error) => {
-        if (error) {
-          console.log('Error Found:', error);
-        } else {
-          console.log(`File ${file.name} has been copied successfully.`);
-        }
-      });
     });
   });
 }

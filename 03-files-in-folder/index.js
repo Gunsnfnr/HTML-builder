@@ -2,15 +2,11 @@ const fs = require('fs');
 const path = require('path');
 
 fs.readdir(
-  path.join(__dirname, '/secret-folder'),
+  path.join(__dirname, 'secret-folder'),
   { withFileTypes: true },
   (err, files) => {
     files.forEach((file) => {
-      const currentFilePath = path.join(
-        __dirname,
-        '/secret-folder/',
-        file.name,
-      );
+      const currentFilePath = path.join(__dirname, 'secret-folder', file.name);
       fs.stat(currentFilePath, (err, stats) => {
         const justAName = path.parse(currentFilePath).name;
         const extension = path.extname(currentFilePath);
