@@ -5,7 +5,7 @@ fs.access(path.join(__dirname, 'files-copy'), (error) => {
   if (error) {
     fs.mkdir(path.join(__dirname, 'files-copy'), (error) => {
       if (error) {
-        console.log('Error Found:', error);
+        console.log('Error found:', error);
       }
       console.log('Created files-copy directory');
       copyFiles();
