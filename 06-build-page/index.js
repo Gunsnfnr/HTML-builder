@@ -3,15 +3,32 @@ const path = require('path');
 let templateHtmlContent = '';
 
 fs.access(path.join(__dirname, 'project-dist'), (error) => {
-  if (error) {
+  function makeDir() {
     fs.mkdir(path.join(__dirname, 'project-dist'), (error) => {
       if (error) {
-        console.log('Error found:', error);
+        console.log('makeDir Error found:', error);
       }
       console.log('Created project-dist directory');
     });
+  }
+  if (error) {
+    console.log('no dir');
+    makeDir();
+    handleCss()
   } else {
-    console.log('project-dist directory exists');
+    console.log('dir exists');
+    handleCss();
+    // fs.rm(
+    //   path.join(__dirname, 'project-dist'),
+    //   { recursive: true },
+    //   (error) => {
+    //     console.log('deleting folder');
+    //     if (error) {
+    //       console.log('rm Error found:', error);
+    //     }
+    //   },
+    // );
+    // makeDir();
   }
 });
 
@@ -33,7 +50,7 @@ readStream.on('data', (dataChunk) => {
             return;
           }
           const componentContent = data;
-          console.log('Reading file ' + currentFilePath);
+          console.log('Reading HTML file ' + currentFilePath);
           const templateTag = '{{' + filename + '}}';
           templateHtmlContent = templateHtmlContent.replace(
             templateTag,
@@ -47,3 +64,35 @@ readStream.on('data', (dataChunk) => {
       });
     });
 });
+
+function handleCss() {
+  const writeStreamCss = fs.createWriteStream(
+    path.join(__dirname, 'project-dist', 'style.css'),
+  );
+
+  fs.promises
+    .readdir(path.join(__dirname, 'styles'), { withFileTypes: true })
+    .then((files) => {
+      files.forEach((file) => {
+        const currentFilePath = path.join(__dirname, 'styles', file.name);
+        const extension = path.extname(currentFilePath).slice(1);
+        async function fillFile() {
+          let promise = new Promise((resolve) => {
+            fs.readFile(currentFilePath, 'utf8', (err, data) => {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              resolve(data);
+            });
+          });
+          if (extension === 'css') {
+            console.log('Reading CSS file ' + currentFilePath);
+            const cssChunk = await promise;
+            writeStreamCss.write(cssChunk);
+          }
+        }
+        fillFile();
+      });
+    });
+}
