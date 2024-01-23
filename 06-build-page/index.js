@@ -4,7 +4,7 @@ let templateHtmlContent = '';
 const pathToAssets = path.join(__dirname, 'assets');
 
 function makeDir(pathToDir) {
-  fs.mkdir(pathToDir, (error) => {
+  fs.mkdir(pathToDir, { recursive: true }, (error) => {
     if (error) {
       console.log('Error found:', error);
     }
